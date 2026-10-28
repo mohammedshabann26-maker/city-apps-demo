@@ -1,0 +1,9 @@
+'use strict';
+const data={shop:[['برجر لحم',18],['بيتزا مارجريتا',25],['شاورما دجاج',12]],drive:[['توصيل أمانة',7],['استلام طلب جاهز',7],['شراء بالنيابة',7]]};
+let mode='shop',picked=null,step=-1;
+const el=id=>document.getElementById(id);
+function reset(){picked=null;step=-1;el('selection').textContent='اختر صنفاً أو خدمة لبدء العرض.';el('price').textContent='';el('steps').replaceChildren();el('start').disabled=true;el('next').hidden=true;}
+function render(){reset();el('catalog').replaceChildren();for(const [name,price] of data[mode]){const card=document.createElement('article');card.className='card';const title=document.createElement('h2');title.textContent=name;const note=document.createElement('p');note.textContent=`${price} د.ل — سعر توضيحي` ;const button=document.createElement('button');button.textContent='اختيار للتجربة';button.addEventListener('click',()=>{reset();picked={name,price};el('selection').textContent=name;el('price').textContent=mode==='shop'?`الصنف ${price} + توصيل 5 = ${price+5} د.ل (وهمي)`:'توصيل 7 د.ل (وهمي)؛ قيمة المشتريات غير مشمولة';el('start').disabled=false;});card.append(title,note,button);el('catalog').append(card);}}
+function advance(){const steps=mode==='shop'?['أُنشئ طلب تجريبي','قبول المحل وتجهيز الطلب','استلام السائق','تم التسليم التجريبي']:['قبول تسعيرة تجريبية','قبول السائق للمهمة','استلام الغرض','تم التسليم التجريبي'];step++;el('steps').replaceChildren();steps.forEach((label,i)=>{const li=document.createElement('li');li.textContent=label;li.className=i<=step?'done':'';el('steps').append(li);});el('start').disabled=true;el('next').hidden=step>=steps.length-1;}
+for(const kind of ['shop','drive'])el(kind).addEventListener('click',()=>{mode=kind;for(const k of ['shop','drive'])el(k).setAttribute('aria-pressed',String(k===mode));render();});
+el('start').addEventListener('click',()=>{if(picked)advance();});el('next').addEventListener('click',advance);el('reset').addEventListener('click',reset);render();
